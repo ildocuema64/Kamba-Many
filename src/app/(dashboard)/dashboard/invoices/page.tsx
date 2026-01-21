@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useInvoiceStore } from '@/store/invoiceStore';
 import { useAuthStore } from '@/store/authStore';
 import InvoiceFilters from '@/components/invoices/InvoiceFilters';
 import InvoiceList from '@/components/invoices/InvoiceList';
+import ProformaModal from '@/components/invoices/ProformaModal';
 import StatsCard from '@/components/dashboard/StatsCard';
 import Button from '@/components/ui/Button';
-import { FileText, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
+import { FileText, CheckCircle, XCircle, Clock, RefreshCw, FilePlus } from 'lucide-react';
 
 export default function InvoicesPage() {
+    const router = useRouter();
     const { user } = useAuthStore();
     const {
         filters,
@@ -20,6 +23,8 @@ export default function InvoicesPage() {
         fetchStats,
         isLoading
     } = useInvoiceStore();
+
+    const [isProformaModalOpen, setIsProformaModalOpen] = useState(false);
 
     useEffect(() => {
         if (user?.organization_id) {
@@ -39,6 +44,16 @@ export default function InvoicesPage() {
             fetchInvoices(user.organization_id);
             fetchStats(user.organization_id);
         }
+    };
+
+    const handleProformaSuccess = (invoiceId: string) => {
+        setIsProformaModalOpen(false);
+        if (user?.organization_id) {
+            fetchInvoices(user.organization_id);
+            fetchStats(user.organization_id);
+        }
+        // Navigate to the created proforma
+        router.push(`/dashboard/invoices/${invoiceId}`);
     };
 
     const formatCurrency = (value: number): string => {
@@ -65,6 +80,13 @@ export default function InvoicesPage() {
                     >
                         <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                         Atualizar
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() => setIsProformaModalOpen(true)}
+                    >
+                        <FilePlus className="w-4 h-4 mr-2" />
+                        Nova Proforma
                     </Button>
                 </div>
             </div>
@@ -116,6 +138,13 @@ export default function InvoicesPage() {
             <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
                 <InvoiceList />
             </div>
+
+            {/* Proforma Modal */}
+            <ProformaModal
+                isOpen={isProformaModalOpen}
+                onClose={() => setIsProformaModalOpen(false)}
+                onSuccess={handleProformaSuccess}
+            />
         </div>
     );
 }

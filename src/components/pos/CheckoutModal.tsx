@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { useCartStore } from '@/store/cartStore';
+import { useCartStore, SaleDocumentType } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { useCustomerStore } from '@/store/customerStore';
 import { SaleRepository } from '@/lib/db/repositories/SaleRepository';
@@ -15,12 +15,14 @@ import {
     CreditCard,
     Building2,
     Smartphone,
-
-
+    FileText,
+    Receipt,
+    FileCheck,
     Loader2,
     Search,
     UserPlus,
-    Users
+    Users,
+    AlertCircle
 } from 'lucide-react';
 
 interface CheckoutModalProps {
@@ -47,6 +49,28 @@ const paymentMethods: { method: PaymentMethod; label: string; icon: React.ReactN
     { method: 'MULTICAIXA', label: 'Multicaixa Express', icon: <Smartphone className="w-5 h-5" /> },
 ];
 
+// Tipos de documento fiscal disponíveis no checkout
+const documentTypes: { type: SaleDocumentType; label: string; description: string; icon: React.ReactNode }[] = [
+    {
+        type: 'FACTURA_RECIBO',
+        label: 'Factura-Recibo (FR)',
+        description: 'Venda com pagamento imediato',
+        icon: <Receipt className="w-5 h-5" />
+    },
+    {
+        type: 'FACTURA',
+        label: 'Factura (FT)',
+        description: 'Venda a crédito (requer NIF)',
+        icon: <FileText className="w-5 h-5" />
+    },
+    {
+        type: 'FACTURA_SIMPLIFICADA',
+        label: 'Factura Simplificada (FS)',
+        description: 'Valores até 25.000 Kz',
+        icon: <FileCheck className="w-5 h-5" />
+    },
+];
+
 const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSuccess }) => {
     const { user } = useAuthStore();
     const {
@@ -55,8 +79,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSucces
         customerNif,
         customerPhone,
         paymentMethod,
+        documentType,
         setCustomer,
         setPaymentMethod,
+        setDocumentType,
         getSubtotal,
         getTaxAmount,
         getDiscountAmount,
@@ -111,11 +137,24 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSucces
             return;
         }
 
+        // Validação: Factura (FT) requer NIF do cliente
+        if (documentType === 'FACTURA' && (!customerNif || customerNif.trim().length < 9)) {
+            setError('Factura (FT) requer NIF válido do cliente (9 dígitos).');
+            return;
+        }
+
+        // Validação: Factura Simplificada (FS) limitada a 25.000 Kz
+        const total = getTotal();
+        if (documentType === 'FACTURA_SIMPLIFICADA' && total > 25000) {
+            setError(`Factura Simplificada limitada a 25.000 Kz. Total actual: ${formatCurrency(total)}. Use Factura ou Factura-Recibo.`);
+            return;
+        }
+
         setIsProcessing(true);
         setError(null);
 
         try {
-            // Create sale
+            // Create sale with selected document type
             const sale = await SaleRepository.create(
                 {
                     organization_id: user.organization_id,
@@ -126,7 +165,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSucces
                     subtotal: getSubtotal(),
                     tax_amount: getTaxAmount(),
                     discount_amount: getDiscountAmount(),
-                    total_amount: getTotal(),
+                    total_amount: total,
                     payment_method: paymentMethod,
                     payment_status: 'PAID',
                     sale_date: new Date().toISOString(),
@@ -139,7 +178,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSucces
                     unit_price: item.product.unit_price,
                     tax_rate: item.product.tax_rate,
                     discount_amount: item.discount,
-                }))
+                })),
+                documentType // Passa o tipo de documento selecionado
             );
 
             // Update stock for each product
@@ -283,6 +323,47 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSucces
                             </button>
                         ))}
                     </div>
+                </div>
+
+                {/* Document Type Selection */}
+                <div className="space-y-4">
+                    <h3 className="font-medium text-gray-900">Tipo de Documento</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {documentTypes.map(({ type, label, description, icon }) => (
+                            <button
+                                key={type}
+                                type="button"
+                                onClick={() => setDocumentType(type)}
+                                className={`
+                                    flex flex-col items-start gap-1 p-4 rounded-xl border-2 transition-all text-left
+                                    ${documentType === type
+                                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                                        : 'border-gray-200 hover:border-gray-300'
+                                    }
+                                `}
+                            >
+                                <div className={`flex items-center gap-2 ${documentType === type ? 'text-[var(--primary)]' : 'text-gray-600'}`}>
+                                    {icon}
+                                    <span className="text-sm font-medium">{label}</span>
+                                </div>
+                                <span className="text-xs text-gray-500">{description}</span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Document type warnings */}
+                    {documentType === 'FACTURA' && !customerNif && (
+                        <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                            <span>Factura (FT) requer NIF do cliente. Preencha o campo NIF acima.</span>
+                        </div>
+                    )}
+                    {documentType === 'FACTURA_SIMPLIFICADA' && getTotal() > 25000 && (
+                        <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                            <span>Factura Simplificada limitada a 25.000 Kz. Total actual: {formatCurrency(getTotal())}</span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Order Summary */}

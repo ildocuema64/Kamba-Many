@@ -4,10 +4,13 @@
  */
 
 import db from '../sqlite';
-import { Sale, SaleItem } from '@/types';
+import { Sale, SaleItem, DocumentType } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 import { InvoiceRepository } from './InvoiceRepository';
+
+// Tipos de documento de venda (excluindo Proformas, NC, ND que são criados separadamente)
+export type SaleDocumentType = 'FACTURA' | 'FACTURA_RECIBO' | 'FACTURA_SIMPLIFICADA';
 
 export class SaleRepository {
     /**
@@ -27,6 +30,7 @@ export class SaleRepository {
 
     /**
      * Criar venda com itens
+     * @param documentType - Tipo de documento fiscal a emitir (FT, FR, FS)
      */
     static async create(
         sale: Omit<Sale, 'id' | 'sale_number' | 'created_at' | 'updated_at'>,
@@ -38,7 +42,8 @@ export class SaleRepository {
             unit_price: number;
             tax_rate: number;
             discount_amount: number;
-        }>
+        }>,
+        documentType: SaleDocumentType = 'FACTURA_RECIBO'
     ): Promise<Sale> {
         const id = uuidv4();
         const now = new Date().toISOString();
@@ -114,7 +119,7 @@ export class SaleRepository {
             const invoice = await InvoiceRepository.create({
                 organization_id: sale.organization_id,
                 sale_id: id,
-                document_type: 'FACTURA', // Default to FR/FT based on payment? usually FT or FR. Let's use FACTURA_RECIBO for immediate payment
+                document_type: documentType, // Usa o tipo de documento selecionado pelo utilizador
                 customer_name: sale.customer_name || 'Consumidor Final',
                 customer_nif: sale.customer_nif,
                 customer_phone: sale.customer_phone,

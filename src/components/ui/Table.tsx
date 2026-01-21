@@ -81,7 +81,7 @@ function Table<T>({
                 <tbody className="bg-white divide-y divide-gray-200">
                     {data.map((item, index) => (
                         <tr
-                            key={keyExtractor ? keyExtractor(item) : (item as any).id || index}
+                            key={keyExtractor(item) ?? `row-${index}`}
                             onClick={() => onRowClick?.(item)}
                             className={onRowClick ? 'hover:bg-gray-50 cursor-pointer transition-colors' : ''}
                         >

@@ -1,16 +1,22 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useInvoiceStore } from '@/store/invoiceStore';
 import InvoiceDetail from '@/components/invoices/InvoiceDetail';
 import Button from '@/components/ui/Button';
-import { ArrowLeft, Printer, Download, XCircle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
+/**
+ * Página de detalhes da factura
+ * 
+ * Responsável por:
+ * - Carregar dados da factura via store
+ * - Renderizar InvoiceDetail (que contém toda a lógica de visualização e acções)
+ */
 export default function InvoiceDetailPage() {
     const params = useParams();
-    const router = useRouter();
     const { selectedInvoice, fetchInvoiceById, clearSelectedInvoice, isLoading } = useInvoiceStore();
 
     const invoiceId = params.id as string;
@@ -47,41 +53,25 @@ export default function InvoiceDetailPage() {
         );
     }
 
-    const handlePrint = () => {
-        window.print();
-    };
-
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
-                <div className="flex items-center gap-4">
-                    <Link
-                        href="/dashboard/invoices"
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                        <ArrowLeft className="w-5 h-5 text-gray-600" />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            Factura {selectedInvoice.invoice_number}
-                        </h1>
-                        <p className="text-gray-500">Detalhes do documento fiscal</p>
-                    </div>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" onClick={handlePrint}>
-                        <Printer className="w-4 h-4 mr-2" />
-                        Imprimir
-                    </Button>
-                    <Button variant="outline">
-                        <Download className="w-4 h-4 mr-2" />
-                        PDF
-                    </Button>
+            {/* Page Header - apenas título, acções estão no InvoiceDetail */}
+            <div className="flex items-center gap-4 print:hidden">
+                <Link
+                    href="/dashboard/invoices"
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                    <ArrowLeft className="w-5 h-5 text-gray-600" />
+                </Link>
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Factura {selectedInvoice.invoice_number}
+                    </h1>
+                    <p className="text-gray-500">Detalhes do documento fiscal</p>
                 </div>
             </div>
 
-            {/* Invoice Detail */}
+            {/* Invoice Detail - contém toda a lógica de visualização, PDF e acções */}
             <InvoiceDetail invoice={selectedInvoice} />
         </div>
     );

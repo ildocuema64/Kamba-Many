@@ -1,0 +1,48 @@
+===============================================================================
+                    CHAVE PÚBLICA PARA CREDENCIAMENTO AGT
+                    Sistema de Faturação Eletrónica Angola
+===============================================================================
+
+Data de Geração: 21 de Janeiro de 2026
+Algoritmo: RSA 2048 bits
+Formato: PEM (Base64)
+
+-------------------------------------------------------------------------------
+                              CHAVE PÚBLICA
+-------------------------------------------------------------------------------
+
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnT/Qa5BNShMleg8GOpei
+FOSmheuve3ckQ6i54EnOkUYu/gWbNSMFFPDGSy0ep//uxfcIPupAT1koArg9xoP1
+cXinqSGrOFQ6Q2PLm5bi2GxxCHveQw3omxTiT/fJ5lGYcaxTp5ae3bj00ddwv1lJ
+mNO+gW5W8o7gJy8mCp7ZTr504V3izt37g+BPx843sW60fTRcj6r1oT94C9Skff2G
+r/8Q9gZ+xm28BdOKIvOjBvXmHZhituABYgpAWP7jGHdi1D0IMufSt5IwGGXRHMHh
+Syr3CvNj8aIQTjG5K+/K6gP7pXRg2nvKv8cxdO4QKfIVvMOm5NymPBTFXSg4VqFy
+7QIDAQAB
+-----END PUBLIC KEY-----
+
+-------------------------------------------------------------------------------
+                              INSTRUÇÕES
+-------------------------------------------------------------------------------
+
+1. Copie o conteúdo entre "-----BEGIN PUBLIC KEY-----" e "-----END PUBLIC KEY-----"
+   (incluindo estas linhas)
+
+2. Acesse o Portal da AGT: https://portal.agt.minfin.gov.ao
+
+3. Navegue até a secção de credenciamento de software de faturação
+
+4. Cole a chave pública no campo apropriado
+
+5. Guarde o ID de credenciamento fornecido pela AGT
+
+-------------------------------------------------------------------------------
+                              AVISOS IMPORTANTES
+-------------------------------------------------------------------------------
+
+⚠️  A chave privada correspondente está em: certificates/private_key.pem
+⚠️  NUNCA partilhe a chave privada
+⚠️  Faça backup seguro da chave privada
+⚠️  A chave privada é usada para assinar digitalmente as faturas
+
+===============================================================================

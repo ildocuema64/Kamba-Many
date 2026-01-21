@@ -29,6 +29,7 @@ const CustomerList: React.FC = () => {
 
     const columns = [
         {
+            key: 'name',
             header: 'Nome',
             accessor: 'name' as keyof Customer,
             render: (item: Customer) => (
@@ -41,6 +42,7 @@ const CustomerList: React.FC = () => {
             )
         },
         {
+            key: 'phone',
             header: 'Contacto',
             accessor: 'phone' as keyof Customer,
             render: (item: Customer) => (
@@ -51,6 +53,7 @@ const CustomerList: React.FC = () => {
             )
         },
         {
+            key: 'address',
             header: 'Morada',
             accessor: 'address' as keyof Customer,
             render: (item: Customer) => (
@@ -60,6 +63,7 @@ const CustomerList: React.FC = () => {
             )
         },
         {
+            key: 'total_purchases',
             header: 'Total Compras',
             accessor: 'total_purchases' as keyof Customer,
             render: (item: Customer) => (
@@ -69,6 +73,7 @@ const CustomerList: React.FC = () => {
             )
         },
         {
+            key: 'is_active',
             header: 'Estado',
             accessor: 'is_active' as keyof Customer,
             render: (item: Customer) => (

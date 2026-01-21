@@ -4,7 +4,10 @@
  */
 
 import { create } from 'zustand';
-import { Product, CartItem, PaymentMethod } from '@/types';
+import { Product, CartItem, PaymentMethod, DocumentType } from '@/types';
+
+// Tipos de documento disponíveis no checkout (vendas)
+export type SaleDocumentType = 'FACTURA' | 'FACTURA_RECIBO' | 'FACTURA_SIMPLIFICADA';
 
 interface CartState {
     items: CartItem[];
@@ -12,6 +15,7 @@ interface CartState {
     customerNif: string;
     customerPhone: string;
     paymentMethod: PaymentMethod;
+    documentType: SaleDocumentType;
 
     // Actions
     addItem: (product: Product, quantity?: number) => void;
@@ -21,6 +25,7 @@ interface CartState {
     clearCart: () => void;
     setCustomer: (name: string, nif: string, phone: string) => void;
     setPaymentMethod: (method: PaymentMethod) => void;
+    setDocumentType: (type: SaleDocumentType) => void;
 
     // Computed
     getSubtotal: () => number;
@@ -36,6 +41,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     customerNif: '',
     customerPhone: '',
     paymentMethod: 'DINHEIRO',
+    documentType: 'FACTURA_RECIBO',
 
     addItem: (product: Product, quantity = 1) => {
         set((state) => {
@@ -96,7 +102,8 @@ export const useCartStore = create<CartState>((set, get) => ({
             customerName: '',
             customerNif: '',
             customerPhone: '',
-            paymentMethod: 'DINHEIRO'
+            paymentMethod: 'DINHEIRO',
+            documentType: 'FACTURA_RECIBO'
         });
     },
 
@@ -106,6 +113,10 @@ export const useCartStore = create<CartState>((set, get) => ({
 
     setPaymentMethod: (method: PaymentMethod) => {
         set({ paymentMethod: method });
+    },
+
+    setDocumentType: (type: SaleDocumentType) => {
+        set({ documentType: type });
     },
 
     getSubtotal: () => {

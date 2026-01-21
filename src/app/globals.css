@@ -351,6 +351,50 @@ a {
   .print-only {
     display: block !important;
   }
+
+  /* Invoice Document Print Styles */
+  .invoice-document {
+    margin: 0;
+    padding: 10mm !important;
+    /* Margem segura para impressoras */
+    box-shadow: none;
+    border: none;
+    width: 100% !important;
+    /* Usar 100% da largura disponível na impressão */
+    max-width: 210mm;
+    min-height: 297mm !important;
+    overflow: hidden;
+    /* Evitar overflow */
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+    /* Remover margens do browser para controlar via CSS */
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .invoice-document table tr {
+    page-break-inside: avoid;
+  }
+
+  .invoice-totals {
+    page-break-inside: avoid;
+  }
+}
+
+/* Invoice Document Base Styles */
+.invoice-document {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 15mm;
+  background: white;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
 }
 
 /* ============================================
