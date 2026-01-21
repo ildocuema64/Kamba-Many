@@ -1,36 +1,171 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤝 KAMBA Many
 
-## Getting Started
+## O Amigo do Seu Negócio
 
-First, run the development server:
+> *Venda, Stock e Facturação Eletrónica*
+
+Sistema completo de Ponto de Venda (POS), Gestão de Stock e Facturação Eletrónica em **conformidade total com a legislação angolana**:
+- ✅ Decreto Executivo n.º 74/19 (6 de Março)
+- ✅ Decreto Presidencial n.º 71/25 (20 de Março de 2025)
+
+### 🎯 Características Principais
+
+#### ⚡ Offline-First
+- Funciona **100% offline** sem necessidade de internet
+- Base de dados local SQLite (WASM)
+- Sincronização automática quando há conexão
+- Resolução inteligente de conflitos
+
+#### 📦 Gestão de Stock
+- Cadastro completo de produtos
+- Controlo de entradas e saídas
+- Alertas de stock baixo
+- Histórico de movimentações
+- Suporte a código de barras
+
+#### 💰 Ponto de Venda (POS)
+- Interface optimizada para venda rápida
+- Scanner de código de barras integrado
+- Pesquisa rápida de produtos
+- Cálculo automático de IVA e totais
+- Múltiplos métodos de pagamento
+
+#### 📄 Facturação Conforme Legislação
+**Documentos Não Fiscais:**
+- Factura Proforma (sem valor fiscal)
+
+**Documentos Fiscais:**
+- Factura
+- Factura-Recibo
+- Factura Simplificada
+- Nota de Crédito
+- Nota de Débito
+
+**Requisitos Legais Implementados:**
+- ✅ Numeração sequencial única
+- ✅ Data e hora de emissão
+- ✅ NIF do emitente e cliente
+- ✅ Cálculo automático de IVA (14%)
+- ✅ Hash/assinatura eletrónica
+- ✅ Código ATCUD
+- ✅ Geração de ficheiros SAF-T
+- ✅ Imutabilidade dos documentos
+- ✅ Armazenamento obrigatório (10 anos)
+
+#### 🖨️ Impressão Térmica
+- Suporte para impressoras térmicas 80mm
+- Layout optimizado para POS
+- Comandos ESC/POS
+- Impressão directa após venda
+- Mensagens legais obrigatórias
+
+#### 💳 Sistema SaaS
+- Planos de assinatura (Mensal, Trimestral, Semestral, Anual)
+- Activação/expiração automática
+- Bloqueio funcional em licença expirada
+- Gestão centralizada pelo SuperAdmin
+
+#### 🔒 Segurança
+- Autenticação segura
+- Criptografia de dados sensíveis
+- Logs de auditoria imutáveis
+- Controlo de acesso por função
+- Protecção contra corrupção de dados
+
+---
+
+## 🚀 Início Rápido
+
+### Pré-requisitos
+
+- Node.js 18+ e npm
+- (Opcional) Conta Supabase para sincronização online
+
+### Instalação
 
 ```bash
+# 1. Instalar dependências
+npm install
+
+# 2. Configurar variáveis de ambiente (opcional)
+cp .env.example .env.local
+
+# 3. Copiar arquivos SQL para public
+mkdir -p public/database public/sql-wasm
+cp database/schema.sql public/database/
+cp node_modules/sql.js/dist/sql-wasm.wasm public/sql-wasm/
+cp node_modules/sql.js/dist/sql-wasm.js public/sql-wasm/
+
+# 4. Executar em modo desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Primeiro Acesso - SuperAdmin
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Credenciais:**
+- Email: `ildocuema@gmail.com`
+- Password: `Ildo7..Marques`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> ⚠️ **IMPORTANTE**: Altere a password após o primeiro acesso!
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Estrutura do Projeto
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+kamba-many/
+├── database/          # Schemas SQL
+├── src/
+│   ├── app/          # Next.js Pages
+│   ├── components/   # Componentes React
+│   ├── lib/          # Lógica de negócio
+│   └── types/        # TypeScript types
+└── docs/             # Documentação
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🛠️ Stack Tecnológica
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js 15** + **React 19** + **TypeScript**
+- **SQLite WASM** (offline) + **PostgreSQL Supabase** (sync)
+- **Tailwind CSS**
+- **Zustand**, **Zod**, **React Hook Form**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📖 Uso do Sistema
+
+### 1. Gestão de Produtos
+- Cadastre produtos com código, barcode, preço e stock
+
+### 2. Realizar Venda (POS)
+- Escaneie ou pesquise produtos
+- Finalize e imprima factura
+
+### 3. Emitir Facturas
+- Geradas automaticamente ou manualmente
+- Hash e ATCUD automáticos
+
+### 4. Administração
+- Gestão de utilizadores, licenças e configurações
+
+---
+
+## 📝 Conformidade Legal
+
+- ✅ Decreto 74/19 e 71/25
+- ✅ IVA 14% Angola
+- ✅ Retenção 10 anos
+
+---
+
+## 🤝 Sobre o Nome
+
+**KAMBA** significa **"Amigo"** em Kimbundu, uma das línguas nacionais de Angola. O nome representa a nossa missão: ser o **amigo de confiança** dos comerciantes angolanos.
+
+**KAMBA Many** - *O Amigo do Seu Negócio* 🇦🇴
+
+---
+
+Para suporte: **ildocuema@gmail.com**
