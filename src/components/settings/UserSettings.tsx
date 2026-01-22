@@ -104,7 +104,7 @@ const UserSettings: React.FC = () => {
                     formData.email,
                     formData.newPassword || 'Ildo7..Marques', // Default known password if created now
                     formData.fullName,
-                    user.role === 'vendedor' ? 'CASHIER' : user.role.toUpperCase() // Fix CHECK constraint
+                    (user.role as string) === 'vendedor' ? 'CASHIER' : user.role.toUpperCase() // Fix CHECK constraint
                 ]);
             } else {
                 // Update

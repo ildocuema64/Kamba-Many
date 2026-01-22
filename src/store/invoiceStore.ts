@@ -72,7 +72,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
             const { user } = useAuthStore.getState();
             if (!user) throw new Error('User not authenticated');
 
-            await InvoiceRepository.cancel(id, reason, user.id, user.organization_id);
+            await InvoiceRepository.cancel(id, reason, user.id, user.organization_id!);
 
             // Refresh details if selected
             const { selectedInvoice, filters } = get();

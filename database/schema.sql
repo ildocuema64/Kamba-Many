@@ -33,6 +33,16 @@ CREATE TABLE IF NOT EXISTS users (
     FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
 );
 
+-- Tabela de Reset de Password
+CREATE TABLE IF NOT EXISTS password_resets (
+    id TEXT PRIMARY KEY, -- Token
+    user_id TEXT NOT NULL,
+    email TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Tabela de Assinaturas/Licenças
 CREATE TABLE IF NOT EXISTS subscriptions (
     id TEXT PRIMARY KEY,
@@ -46,6 +56,25 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+);
+
+-- Tabela de Pedidos de Assinatura/Activação
+CREATE TABLE IF NOT EXISTS subscription_requests (
+    id TEXT PRIMARY KEY,
+    organization_id TEXT NOT NULL,
+    plan_type TEXT NOT NULL CHECK (plan_type IN ('MENSAL', 'TRIMESTRAL', 'SEMESTRAL', 'ANUAL')),
+    payment_method TEXT NOT NULL CHECK (payment_method IN ('TRANSFERENCIA', 'MULTICAIXA_EXPRESS')),
+    reference_code TEXT UNIQUE NOT NULL,
+    activation_code_hash TEXT,
+    amount REAL NOT NULL,
+    status TEXT DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACTIVATED', 'REJECTED', 'EXPIRED')),
+    requested_at TEXT DEFAULT (datetime('now')),
+    activated_at TEXT,
+    activated_by TEXT,
+    subscription_id TEXT,
+    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+    FOREIGN KEY (activated_by) REFERENCES users(id),
+    FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)
 );
 
 -- Tabela de Categorias de Produtos

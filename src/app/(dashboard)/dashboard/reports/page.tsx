@@ -20,6 +20,7 @@ interface PaymentMethodData {
     name: string;
     value: number;
     color: string;
+    [key: string]: string | number;
 }
 
 interface TopProduct {
@@ -271,8 +272,8 @@ export default function ReportsPage() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${activeTab === tab.id
-                                ? 'bg-blue-100 text-blue-700 font-medium'
-                                : 'text-gray-600 hover:bg-gray-100'
+                            ? 'bg-blue-100 text-blue-700 font-medium'
+                            : 'text-gray-600 hover:bg-gray-100'
                             }`}
                     >
                         <tab.icon className="w-4 h-4" />

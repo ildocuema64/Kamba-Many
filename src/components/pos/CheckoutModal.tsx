@@ -107,7 +107,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSucces
     React.useEffect(() => {
         if (searchQuery.trim() && user?.organization_id) {
             const delayDebounceFn = setTimeout(async () => {
-                const results = await searchCustomers(searchQuery, user.organization_id);
+                const results = await searchCustomers(searchQuery, user.organization_id!);
                 setSearchResults(results);
             }, 300);
             return () => clearTimeout(delayDebounceFn);
@@ -117,7 +117,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, onSucces
     }, [searchQuery, user?.organization_id, searchCustomers]);
 
     const handleSelectCustomer = (customer: typeof customers[0]) => {
-        setCustomer(customer.name, customer.nif, customer.phone);
+        setCustomer(customer.name, customer.nif || '', customer.phone || '');
         setSearchQuery('');
         setSearchResults([]);
         // Optional: switch to manual to show the filled data clearly? or keep in search mode with "Selected: X"

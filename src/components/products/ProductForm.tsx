@@ -43,7 +43,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, isLoad
     const router = useRouter();
 
     const { register, handleSubmit, control, formState: { errors } } = useForm<ProductFormData>({
-        resolver: zodResolver(productSchema),
+        resolver: zodResolver(productSchema) as any,
         defaultValues: initialData ? {
             name: initialData.name,
             code: initialData.code,

@@ -1,29 +1,37 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePermissions } from '@/hooks/usePermissions';
 import OrganizationSettings from '@/components/settings/OrganizationSettings';
 import UserSettings from '@/components/settings/UserSettings';
 import PrinterSettings from '@/components/settings/PrinterSettings';
 import SystemSettings from '@/components/settings/SystemSettings';
 import CategorySettings from '@/components/settings/CategorySettings';
 import DatabaseSettings from '@/components/settings/DatabaseSettings';
+import UsersManagement from '@/components/settings/UsersManagement';
 import SaftExport from '@/components/saft/SaftExport';
-import { Building, User, Printer, Database, Layers, HardDrive, FileCode } from 'lucide-react';
+import { Building, User, Printer, Database, Layers, HardDrive, FileCode, Users } from 'lucide-react';
 
-type SettingsTab = 'organization' | 'categories' | 'user' | 'printer' | 'database' | 'system' | 'compliance';
+type SettingsTab = 'organization' | 'categories' | 'users' | 'user' | 'printer' | 'database' | 'system' | 'compliance';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<SettingsTab>('organization');
+    const { isAdmin } = usePermissions();
 
-    const tabs = [
-        { id: 'organization' as SettingsTab, label: 'Organização', icon: Building },
-        { id: 'categories' as SettingsTab, label: 'Categorias', icon: Layers },
-        { id: 'user' as SettingsTab, label: 'Perfil', icon: User },
-        { id: 'printer' as SettingsTab, label: 'Impressora', icon: Printer },
-        { id: 'database' as SettingsTab, label: 'Base de Dados', icon: HardDrive },
-        { id: 'system' as SettingsTab, label: 'Sistema', icon: Database },
-        { id: 'compliance' as SettingsTab, label: 'Fiscal / SAF-T', icon: FileCode },
+    // Tabs base
+    const baseTabs: { id: SettingsTab; label: string; icon: any; adminOnly?: boolean }[] = [
+        { id: 'organization', label: 'Organização', icon: Building },
+        { id: 'categories', label: 'Categorias', icon: Layers },
+        { id: 'users', label: 'Utilizadores', icon: Users, adminOnly: true },
+        { id: 'user', label: 'Meu Perfil', icon: User },
+        { id: 'printer', label: 'Impressora', icon: Printer },
+        { id: 'database', label: 'Base de Dados', icon: HardDrive },
+        { id: 'system', label: 'Sistema', icon: Database },
+        { id: 'compliance', label: 'Fiscal / SAF-T', icon: FileCode },
     ];
+
+    // Filtrar tabs baseado em permissões
+    const tabs = baseTabs.filter(tab => !tab.adminOnly || isAdmin);
 
     return (
         <div className="space-y-6">
@@ -57,6 +65,7 @@ export default function SettingsPage() {
                 <div className="flex-1">
                     {activeTab === 'organization' && <OrganizationSettings />}
                     {activeTab === 'categories' && <CategorySettings />}
+                    {activeTab === 'users' && isAdmin && <UsersManagement />}
                     {activeTab === 'user' && <UserSettings />}
                     {activeTab === 'printer' && <PrinterSettings />}
                     {activeTab === 'database' && <DatabaseSettings />}
@@ -67,3 +76,4 @@ export default function SettingsPage() {
         </div>
     );
 }
+

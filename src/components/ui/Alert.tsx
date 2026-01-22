@@ -3,10 +3,11 @@ import React from 'react';
 export interface AlertProps {
     children: React.ReactNode;
     variant?: 'success' | 'warning' | 'error' | 'info';
+    className?: string;
     onClose?: () => void;
 }
 
-const Alert: React.FC<AlertProps> = ({ children, variant = 'info', onClose }) => {
+const Alert: React.FC<AlertProps> = ({ children, variant = 'info', className = '', onClose }) => {
     const variantConfig = {
         success: {
             bg: 'bg-green-50',
@@ -53,7 +54,7 @@ const Alert: React.FC<AlertProps> = ({ children, variant = 'info', onClose }) =>
     const config = variantConfig[variant];
 
     return (
-        <div className={`${config.bg} ${config.border} ${config.text} border rounded-lg p-4 flex items-start gap-3`}>
+        <div className={`${config.bg} ${config.border} ${config.text} border rounded-lg p-4 flex items-start gap-3 ${className}`}>
             <div className="flex-shrink-0">{config.icon}</div>
             <div className="flex-1">{children}</div>
             {onClose && (

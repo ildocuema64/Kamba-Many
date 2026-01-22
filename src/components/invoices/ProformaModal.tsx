@@ -94,7 +94,7 @@ const ProformaModal: React.FC<ProformaModalProps> = ({ isOpen, onClose, onSucces
     useEffect(() => {
         if (customerSearchQuery.trim() && user?.organization_id) {
             const delayDebounceFn = setTimeout(async () => {
-                const results = await searchCustomers(customerSearchQuery, user.organization_id);
+                const results = await searchCustomers(customerSearchQuery, user.organization_id!);
                 setCustomerSearchResults(results);
             }, 300);
             return () => clearTimeout(delayDebounceFn);

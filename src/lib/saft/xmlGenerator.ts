@@ -217,7 +217,7 @@ export class SaftGenerator {
             xml += `          <InvoiceStatus>${invoice.status === 'ANULADA' ? 'A' : 'N'}</InvoiceStatus>\n`; // N = Normal, A = Anulado, S = Self Billing
             xml += `          <InvoiceStatusDate>${this.formatDateTime(invoice.cancelled_at || invoice.issue_date)}</InvoiceStatusDate>\n`;
             xml += `          <SourceID>${invoice.user_id}</SourceID>\n`;
-            xml += `          <SourceBilling>${invoice.document_type === 'AUTO_FACTURA' ? 'P' : 'P'}</SourceBilling>\n`; // P = Produced by app
+            xml += `          <SourceBilling>P</SourceBilling>\n`; // P = Produced by app
             xml += `        </DocumentStatus>\n`;
 
             xml += `        <Hash>${invoice.hash || '0'}</Hash>\n`;

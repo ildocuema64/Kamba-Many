@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input, Button, Alert, Card } from '@/components/ui';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
 
 export default function ResetPasswordPage() {
     const router = useRouter();
@@ -15,6 +16,8 @@ export default function ResetPasswordPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+
+    const { resetPassword } = useAuthStore();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,12 +39,8 @@ export default function ResetPasswordPage() {
             return;
         }
 
-        setIsLoading(true);
-
         try {
-            // TODO: Implementar reset de password real
-            // Por agora, simular processo
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await resetPassword(token, password);
 
             setSuccess(true);
 
@@ -51,8 +50,6 @@ export default function ResetPasswordPage() {
             }, 2000);
         } catch (err) {
             setError((err as Error).message || 'Erro ao redefinir password');
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -152,8 +149,8 @@ export default function ResetPasswordPage() {
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-2 text-sm">
                                             <div className={`flex-1 h-2 rounded-full ${password.length >= 12 ? 'bg-green-500' :
-                                                    password.length >= 8 ? 'bg-yellow-500' :
-                                                        'bg-red-500'
+                                                password.length >= 8 ? 'bg-yellow-500' :
+                                                    'bg-red-500'
                                                 }`} />
                                             <span className="text-xs text-gray-600">
                                                 {password.length >= 12 ? 'Forte' :

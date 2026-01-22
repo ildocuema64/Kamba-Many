@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '@/components/ui/Card';
 import { Download, FileCode, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { SaftGenerator } from '@/lib/saft/xmlGenerator';
 import { useAuthStore } from '@/store/authStore';
+import { OrganizationRepository, type Organization } from '@/lib/db/repositories/OrganizationRepository';
 
 export default function SaftExport() {
     const { user } = useAuthStore();
     const [isLoading, setIsLoading] = useState(false);
+    const [organization, setOrganization] = useState<Organization | null>(null);
     const [startDate, setStartDate] = useState(() => {
         const date = new Date();
         date.setDate(1); // First day of current month
@@ -21,8 +23,21 @@ export default function SaftExport() {
     const [successMessage, setSuccessMessage] = useState('');
     const [error, setError] = useState('');
 
+    // Carregar dados da organização ao montar
+    useEffect(() => {
+        if (user?.organization_id) {
+            const org = OrganizationRepository.findById(user.organization_id);
+            setOrganization(org);
+        }
+    }, [user?.organization_id]);
+
     const handleExport = async () => {
         if (!user?.organization_id) return;
+
+        if (!organization) {
+            setError('Dados da organização não encontrados. Configure a empresa nas definições.');
+            return;
+        }
 
         setIsLoading(true);
         setError('');
@@ -31,20 +46,7 @@ export default function SaftExport() {
         try {
             const generator = new SaftGenerator();
 
-            // Mock organization object for now or fetch it properly
-            // In a real app, we should fetch the full Organization details
-            const organization = {
-                id: user.organization_id,
-                name: 'Minha Empresa Demo', // TODO: Fetch from store
-                nif: '5417082695', // TODO: Fetch from store
-                address: 'Luanda, Angola',
-                fiscal_regime: 'GERAL',
-                is_active: true,
-                created_at: '',
-                updated_at: ''
-            } as any;
-
-            const xml = await generator.generate(user.organization_id, startDate, endDate, organization);
+            const xml = await generator.generate(user.organization_id, startDate, endDate, organization as any);
 
             // Trigger Download
             const blob = new Blob([xml], { type: 'application/xml' });

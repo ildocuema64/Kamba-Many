@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Input, Button, Alert, Card } from '@/components/ui';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState('');
@@ -10,26 +11,23 @@ export default function ForgotPasswordPage() {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
 
+    const { requestPasswordReset } = useAuthStore();
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        setIsLoading(true);
+
+        // Validar email básico
+        if (!email.includes('@')) {
+            setError('Email inválido');
+            return;
+        }
 
         try {
-            // TODO: Implementar envio de email real
-            // Por agora, simular processo de recuperação
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Validar email básico
-            if (!email.includes('@')) {
-                throw new Error('Email inválido');
-            }
-
+            await requestPasswordReset(email);
             setSuccess(true);
         } catch (err) {
             setError((err as Error).message || 'Erro ao enviar email de recuperação');
-        } finally {
-            setIsLoading(false);
         }
     };
 

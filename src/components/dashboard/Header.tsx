@@ -2,6 +2,7 @@
 
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
+import { usePermissions } from '@/hooks/usePermissions';
 import NotificationBell from './NotificationBell';
 
 interface HeaderProps {
@@ -11,6 +12,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const router = useRouter();
     const { user, logout } = useAuthStore();
+    const { roleLabel, roleColors } = usePermissions();
 
     const handleLogout = () => {
         logout();
@@ -42,14 +44,14 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     {/* User Dropdown */}
                     <div className="relative group">
                         <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                {user?.name?.charAt(0).toUpperCase() || 'U'}
                             </div>
                             <div className="hidden md:block text-left">
                                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                                <p className="text-xs text-gray-500">{user?.role}</p>
+                                <span className={`text-xs px-1.5 py-0.5 rounded-full ${roleColors.bg} ${roleColors.text}`}>
+                                    {roleLabel}
+                                </span>
                             </div>
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

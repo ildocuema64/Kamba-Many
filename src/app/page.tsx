@@ -2,20 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Simular verificação de autenticação
-    const checkAuth = async () => {
-      // TODO: Implementar verificação real de autenticação
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setIsLoading(false);
-    };
+  const { isAuthenticated } = useAuthStore();
+  const router = useRouter();
 
-    checkAuth();
-  }, []);
+  useEffect(() => {
+    // Verificar autenticação real
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, router]);
 
   if (isLoading) {
     return (

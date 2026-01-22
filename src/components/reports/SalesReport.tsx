@@ -29,6 +29,7 @@ interface PaymentMethodData {
     name: string;
     value: number;
     color: string;
+    [key: string]: string | number;
 }
 
 interface SalesReportProps {
@@ -137,7 +138,7 @@ const SalesReport: React.FC<SalesReportProps> = ({
                                     tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
                                 />
                                 <Tooltip
-                                    formatter={(value: number) => [`${formatCurrency(value)} Kz`, 'Valor']}
+                                    formatter={(value?: number) => [`${formatCurrency(value ?? 0)} Kz`, 'Valor']}
                                     labelStyle={{ color: '#374151' }}
                                     contentStyle={{
                                         backgroundColor: '#fff',
@@ -172,7 +173,7 @@ const SalesReport: React.FC<SalesReportProps> = ({
                                     outerRadius={90}
                                     paddingAngle={2}
                                     dataKey="value"
-                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                    label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
                                     labelLine={false}
                                 >
                                     {paymentMethods.map((entry, index) => (
@@ -180,7 +181,7 @@ const SalesReport: React.FC<SalesReportProps> = ({
                                     ))}
                                 </Pie>
                                 <Tooltip
-                                    formatter={(value: number) => [`${formatCurrency(value)} Kz`, 'Valor']}
+                                    formatter={(value?: number) => [`${formatCurrency(value ?? 0)} Kz`, 'Valor']}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
