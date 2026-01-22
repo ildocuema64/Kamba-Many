@@ -10,9 +10,10 @@ import CategorySettings from '@/components/settings/CategorySettings';
 import DatabaseSettings from '@/components/settings/DatabaseSettings';
 import UsersManagement from '@/components/settings/UsersManagement';
 import SaftExport from '@/components/saft/SaftExport';
-import { Building, User, Printer, Database, Layers, HardDrive, FileCode, Users } from 'lucide-react';
+import SubscriptionSettings from '@/components/settings/SubscriptionSettings';
+import { Building, User, Printer, Database, Layers, HardDrive, FileCode, Users, CreditCard } from 'lucide-react';
 
-type SettingsTab = 'organization' | 'categories' | 'users' | 'user' | 'printer' | 'database' | 'system' | 'compliance';
+type SettingsTab = 'organization' | 'subscription' | 'categories' | 'users' | 'user' | 'printer' | 'database' | 'system' | 'compliance';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<SettingsTab>('organization');
@@ -21,6 +22,7 @@ export default function SettingsPage() {
     // Tabs base
     const baseTabs: { id: SettingsTab; label: string; icon: any; adminOnly?: boolean }[] = [
         { id: 'organization', label: 'Organização', icon: Building },
+        { id: 'subscription', label: 'Assinatura', icon: CreditCard },
         { id: 'categories', label: 'Categorias', icon: Layers },
         { id: 'users', label: 'Utilizadores', icon: Users, adminOnly: true },
         { id: 'user', label: 'Meu Perfil', icon: User },
@@ -64,6 +66,7 @@ export default function SettingsPage() {
                 {/* Content */}
                 <div className="flex-1">
                     {activeTab === 'organization' && <OrganizationSettings />}
+                    {activeTab === 'subscription' && <SubscriptionSettings />}
                     {activeTab === 'categories' && <CategorySettings />}
                     {activeTab === 'users' && isAdmin && <UsersManagement />}
                     {activeTab === 'user' && <UserSettings />}
