@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Activação - KAMBA POS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 500px; margin: 2rem auto; padding: 0 1rem; background: #f9fafb; }
+        .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1 { color: #111827; margin-bottom: 1.5rem; font-size: 1.25rem; text-align: center; }
+        label { display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500; }
+        input, select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; margin-bottom: 1rem; box-sizing: border-box; }
+        button { width: 100%; padding: 0.75rem; background: #2563eb; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        #result { margin-top: 1.5rem; padding: 1rem; background: #ecfdf5; border: 1px solid #10b981; border-radius: 0.5rem; display: none; text-align: center; }
+        .code { font-family: monospace; font-size: 1.5rem; font-weight: bold; color: #047857; letter-spacing: 2px; margin: 0.5rem 0; word-break: break-all; }
+        .warning { background: #fee2e2; color: #991b1b; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔐 Gerador de Activação Remota</h1>
+        
+        <div class="warning">
+            ⚠️ <strong>USO RESTRITO SUPERADMIN</strong><br>
+            Não partilhe esta ferramenta. Contém a chave mestra.
+        </div>
+
+        <form id="generatorForm">
+            <label for="reference">Referência do Cliente</label>
+            <input type="text" id="reference" placeholder="Ex: REF-KJ7S8A" required uppercase>
+
+            <label for="plan">Plano Escolhido</label>
+            <select id="plan">
+                <option value="MENSAL">Mensal (30 dias)</option>
+                <option value="TRIMESTRAL">Trimestral (90 dias)</option>
+                <option value="SEMESTRAL">Semestral (180 dias)</option>
+                <option value="ANUAL">Anual (365 dias)</option>
+            </select>
+
+            <button type="submit">Gerar Código</button>
+        </form>
+
+        <div id="result">
+            <div style="font-size: 0.875rem; color: #065f46; margin-bottom: 0.5rem">Código Gerado:</div>
+            <div class="code" id="activationCode"></div>
+            <button onclick="copyToClipboard()" style="background: #059669; margin-top: 0.5rem; font-size: 0.875rem; padding: 0.5rem">Copiar</button>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO SECRETA (Mantém sincronizada com o sistema)
+        const SECRET = 'KAMBA-MANY-POS-ANGOLA-2026-SECURE';
+
+        document.getElementById('generatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const reference = document.getElementById('reference').value.trim().toUpperCase();
+            const plan = document.getElementById('plan').value;
+
+            if (!reference) return;
+
+            // Lógica de Geração Determinística (Igual ao activationService.ts)
+            const rawString = `${reference}|${plan}|${SECRET}`;
+            const hash = CryptoJS.SHA256(rawString).toString();
+            
+            const rawCode = hash.substring(0, 12).toUpperCase();
+            const formattedCode = `ACT-${rawCode.substring(0, 4)}-${rawCode.substring(4, 8)}-${rawCode.substring(8, 12)}`;
+
+            document.getElementById('activationCode').textContent = formattedCode;
+            document.getElementById('result').style.display = 'block';
+        });
+
+        function copyToClipboard() {
+            const code = document.getElementById('activationCode').textContent;
+            navigator.clipboard.writeText(code);
+            alert('Copiado!');
+        }
+    </script>
+</body>
+</html>

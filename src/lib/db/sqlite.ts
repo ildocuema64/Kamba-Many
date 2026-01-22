@@ -89,9 +89,84 @@ class SQLiteManager {
                         this.db.run("ALTER TABLE invoice_items ADD COLUMN tax_exemption_code TEXT");
                     }
 
+
                     if (!itemCols.some((col: any) => col.name === 'tax_exemption_reason')) {
                         console.log('Running migration: Adding tax_exemption_reason to invoice_items');
                         this.db.run("ALTER TABLE invoice_items ADD COLUMN tax_exemption_reason TEXT");
+                    }
+
+
+
+                    // 4. Subscription Tables Migration - Create if not exist
+                    const tables = this.query<{ name: string }>(
+                        "SELECT name FROM sqlite_master WHERE type='table'"
+                    );
+                    const tableNames = tables.map(t => t.name);
+
+                    if (!tableNames.includes('subscriptions')) {
+                        console.log('Running migration: Creating subscriptions table');
+                        this.db.run(`
+                            CREATE TABLE IF NOT EXISTS subscriptions (
+                                id TEXT PRIMARY KEY,
+                                organization_id TEXT NOT NULL,
+                                plan_type TEXT NOT NULL CHECK (plan_type IN ('MENSAL', 'TRIMESTRAL', 'SEMESTRAL', 'ANUAL')),
+                                status TEXT NOT NULL CHECK (status IN ('ACTIVE', 'EXPIRED', 'CANCELLED', 'PENDING')),
+                                start_date TEXT NOT NULL,
+                                end_date TEXT NOT NULL,
+                                amount REAL NOT NULL,
+                                payment_status TEXT CHECK (payment_status IN ('PAID', 'PENDING', 'FAILED')),
+                                created_at TEXT DEFAULT (datetime('now')),
+                                updated_at TEXT DEFAULT (datetime('now'))
+                            )
+                        `);
+                    }
+
+                    if (!tableNames.includes('subscription_requests')) {
+                        console.log('Running migration: Creating subscription_requests table');
+                        this.db.run(`
+                            CREATE TABLE IF NOT EXISTS subscription_requests (
+                                id TEXT PRIMARY KEY,
+                                organization_id TEXT NOT NULL,
+                                plan_type TEXT NOT NULL CHECK (plan_type IN ('MENSAL', 'TRIMESTRAL', 'SEMESTRAL', 'ANUAL')),
+                                payment_method TEXT NOT NULL CHECK (payment_method IN ('TRANSFERENCIA', 'MULTICAIXA_EXPRESS')),
+                                reference_code TEXT UNIQUE NOT NULL,
+                                activation_code_hash TEXT,
+                                amount REAL NOT NULL,
+                                status TEXT DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACTIVATED', 'REJECTED', 'EXPIRED')),
+                                requested_at TEXT DEFAULT (datetime('now')),
+                                activated_at TEXT,
+                                activated_by TEXT,
+                                subscription_id TEXT,
+                                customer_phone TEXT,
+                                admin_notes TEXT
+                            )
+                        `);
+                    }
+
+                    if (!tableNames.includes('password_resets')) {
+                        console.log('Running migration: Creating password_resets table');
+                        this.db.run(`
+                            CREATE TABLE IF NOT EXISTS password_resets (
+                                id TEXT PRIMARY KEY,
+                                user_id TEXT NOT NULL,
+                                email TEXT NOT NULL,
+                                expires_at TEXT NOT NULL,
+                                created_at TEXT DEFAULT (datetime('now'))
+                            )
+                        `);
+                    }
+
+                    // 5. Subscription Requests Column Migrations (Post-Create check)
+                    const requestCols = this.query("PRAGMA table_info(subscription_requests)");
+
+                    if (!requestCols.some((col: any) => col.name === 'admin_notes')) {
+                        console.log('Running migration: Adding admin_notes to subscription_requests');
+                        this.db.run("ALTER TABLE subscription_requests ADD COLUMN admin_notes TEXT");
+                    }
+
+                    if (!requestCols.some((col: any) => col.name === 'customer_phone')) {
+                        console.log('Running migration: Adding customer_phone to subscription_requests');
+                        this.db.run("ALTER TABLE subscription_requests ADD COLUMN customer_phone TEXT");
                     }
 
                     // Always save after potential schema changes

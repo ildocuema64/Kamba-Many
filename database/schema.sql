@@ -72,6 +72,8 @@ CREATE TABLE IF NOT EXISTS subscription_requests (
     activated_at TEXT,
     activated_by TEXT,
     subscription_id TEXT,
+    customer_phone TEXT, -- Telefone para envio do código
+    admin_notes TEXT,    -- Notas internas do admin
     FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
     FOREIGN KEY (activated_by) REFERENCES users(id),
     FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)

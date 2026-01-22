@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { SubscriptionGuard } from '@/components/auth/SubscriptionGuard';
 import { ToastProvider } from '@/components/ui/Toast';
 
 import Breadcrumbs from '@/components/dashboard/Breadcrumbs';
@@ -35,7 +36,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <div className="print:hidden">
                                 <Breadcrumbs />
                             </div>
-                            {children}
+                            <SubscriptionGuard>
+                                {children}
+                            </SubscriptionGuard>
                         </main>
                     </div>
                 </div>

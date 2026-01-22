@@ -254,6 +254,9 @@ const UsersManagement: React.FC = () => {
         ? ['SUPERADMIN', 'ADMIN', 'MANAGER', 'CASHIER', 'VIEWER']
         : ['ADMIN', 'MANAGER', 'CASHIER', 'VIEWER'];
 
+    // Filter users: Hide SUPERADMIN from non-SuperAdmins
+    const visibleUsers = users.filter(u => isSuperAdmin || u.role !== 'SUPERADMIN');
+
     if (!isAdmin) {
         return (
             <Card>
@@ -284,7 +287,7 @@ const UsersManagement: React.FC = () => {
                 {/* Lista de Utilizadores */}
                 {isLoading ? (
                     <div className="text-center py-8 text-gray-500">Carregando...</div>
-                ) : users.length === 0 ? (
+                ) : visibleUsers.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                         Nenhum utilizador encontrado.
                     </div>
@@ -301,7 +304,7 @@ const UsersManagement: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((user) => {
+                                {visibleUsers.map((user) => {
                                     const colors = ROLE_COLORS[user.role] || ROLE_COLORS.VIEWER;
                                     const isCurrentUser = user.id === currentUser?.id;
 
@@ -328,8 +331,8 @@ const UsersManagement: React.FC = () => {
                                             </td>
                                             <td className="py-3 px-4">
                                                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${user.is_active
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-red-100 text-red-800'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
                                                     }`}>
                                                     {user.is_active ? 'Activo' : 'Inactivo'}
                                                 </span>
@@ -348,8 +351,8 @@ const UsersManagement: React.FC = () => {
                                                             <button
                                                                 onClick={() => handleToggleActive(user)}
                                                                 className={`p-2 rounded-lg transition-colors ${user.is_active
-                                                                        ? 'text-gray-500 hover:text-orange-600 hover:bg-orange-50'
-                                                                        : 'text-gray-500 hover:text-green-600 hover:bg-green-50'
+                                                                    ? 'text-gray-500 hover:text-orange-600 hover:bg-orange-50'
+                                                                    : 'text-gray-500 hover:text-green-600 hover:bg-green-50'
                                                                     }`}
                                                                 title={user.is_active ? 'Desactivar' : 'Activar'}
                                                             >

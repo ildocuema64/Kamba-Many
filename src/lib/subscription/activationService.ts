@@ -61,32 +61,36 @@ export function generateReferenceCode(): string {
 }
 
 /**
- * Gera um código de activação interno (apenas SuperAdmin vê)
+ * Gera um código de activação interno (determinístico)
  * Formato: ACT-XXXX-XXXX-XXXX
- * IMPORTANTE: Este código NUNCA é exposto ao utilizador comum
+ * Code = HMAC(Reference + Plan + Secret)
+ * 
+ * IMPORTANTE: Agora é puramente determinístico para permitir geração remota.
+ * O SuperAdmin só precisa da Referência e do Plano para gerar o mesmo código.
  */
 export function generateActivationCode(referenceCode: string, planType: PlanType): string {
-    const timestamp = Date.now().toString(36);
-    const hash = CryptoJS.SHA256(`${referenceCode}-${planType}-${timestamp}-${ACTIVATION_SECRET}`).toString();
+    // SECURITY: Algoritmo Determinístico
+    // Se mudarmos o SECRET, todos os códigos antigos deixam de funcionar
+    const rawString = `${referenceCode.toUpperCase()}|${planType}|${ACTIVATION_SECRET}`;
+    const hash = CryptoJS.SHA256(rawString).toString();
 
     // Formatar como ACT-XXXX-XXXX-XXXX
+    // Usamos os primeiros 12 caracteres do hash hexadecimal
     const code = hash.substring(0, 12).toUpperCase();
     return `ACT-${code.substring(0, 4)}-${code.substring(4, 8)}-${code.substring(8, 12)}`;
 }
 
 /**
- * Gera o hash do código de activação para armazenamento seguro
+ * Valida um código de activação
+ * Recalcula o código esperado com base na Referência e Plano e compara com o Input
  */
-export function hashActivationCode(code: string): string {
-    return CryptoJS.SHA256(`${code}-${ACTIVATION_SECRET}`).toString();
-}
-
-/**
- * Valida um código de activação contra o hash armazenado
- */
-export function validateActivationCode(code: string, storedHash: string): boolean {
-    const inputHash = hashActivationCode(code);
-    return inputHash === storedHash;
+export function validateActivationCode(
+    inputCode: string,
+    referenceCode: string,
+    planType: PlanType
+): boolean {
+    const expectedCode = generateActivationCode(referenceCode, planType);
+    return inputCode.toUpperCase() === expectedCode;
 }
 
 /**

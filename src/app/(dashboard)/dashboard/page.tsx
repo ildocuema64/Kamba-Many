@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { useAuthStore } from '@/store/authStore';
@@ -10,6 +10,7 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import SalesChart from '@/components/dashboard/SalesChart';
 import TopProducts from '@/components/dashboard/TopProducts';
 import Link from 'next/link';
+import db from '@/lib/db/sqlite';
 import {
     ShoppingCart,
     Package,
@@ -24,18 +25,68 @@ export default function DashboardPage() {
     const { products, fetchProducts } = useProductStore();
     const { lowStockProducts, fetchLowStock } = useStockStore();
 
+    // Real stats data
+    const [todaySales, setTodaySales] = useState(0);
+    const [monthInvoices, setMonthInvoices] = useState(0);
+
     useEffect(() => {
         if (user?.organization_id) {
             fetchProducts(user.organization_id);
             fetchLowStock(user.organization_id);
+
+            // Fetch today's sales
+            const fetchTodaySales = async () => {
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    const result = await db.queryOne<{ total: number }>(
+                        `SELECT COALESCE(SUM(total_amount), 0) as total 
+                         FROM sales 
+                         WHERE organization_id = ? 
+                           AND date(sale_date) = date(?)`,
+                        [user.organization_id, today]
+                    );
+                    setTodaySales(result?.total || 0);
+                } catch (error) {
+                    console.error('Error fetching today sales:', error);
+                }
+            };
+
+            // Fetch this month's invoices count
+            const fetchMonthInvoices = async () => {
+                try {
+                    const now = new Date();
+                    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+                    const result = await db.queryOne<{ count: number }>(
+                        `SELECT COUNT(*) as count 
+                         FROM invoices 
+                         WHERE organization_id = ? 
+                           AND date(issue_date) >= date(?)`,
+                        [user.organization_id, startOfMonth]
+                    );
+                    setMonthInvoices(result?.count || 0);
+                } catch (error) {
+                    console.error('Error fetching month invoices:', error);
+                }
+            };
+
+            fetchTodaySales();
+            fetchMonthInvoices();
         }
     }, [user?.organization_id, fetchProducts, fetchLowStock]);
+
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('pt-AO', {
+            style: 'decimal',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value) + ' Kz';
+    };
 
     const stats = [
         {
             title: 'Vendas Hoje',
-            value: '0 Kz',
-            change: '+0%',
+            value: formatCurrency(todaySales),
+            change: todaySales > 0 ? 'Actualizado' : 'Sem vendas',
             icon: <ShoppingCart className="w-8 h-8 text-green-600" />,
             color: 'text-green-600',
             bg: 'bg-green-50',
@@ -58,13 +109,14 @@ export default function DashboardPage() {
         },
         {
             title: 'Facturas',
-            value: '0',
+            value: monthInvoices.toString(),
             change: 'Este mês',
             icon: <FileText className="w-8 h-8 text-purple-600" />,
             color: 'text-purple-600',
             bg: 'bg-purple-50',
         },
     ];
+
 
     return (
         <div>

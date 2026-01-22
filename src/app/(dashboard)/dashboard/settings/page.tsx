@@ -11,29 +11,38 @@ import DatabaseSettings from '@/components/settings/DatabaseSettings';
 import UsersManagement from '@/components/settings/UsersManagement';
 import SaftExport from '@/components/saft/SaftExport';
 import SubscriptionSettings from '@/components/settings/SubscriptionSettings';
-import { Building, User, Printer, Database, Layers, HardDrive, FileCode, Users, CreditCard } from 'lucide-react';
+import ActivationManager from '@/components/settings/ActivationManager';
+import { Building, User, Printer, Database, Layers, HardDrive, FileCode, Users, CreditCard, Key } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 
-type SettingsTab = 'organization' | 'subscription' | 'categories' | 'users' | 'user' | 'printer' | 'database' | 'system' | 'compliance';
+type SettingsTab = 'organization' | 'subscription' | 'activations' | 'categories' | 'users' | 'user' | 'printer' | 'database' | 'system' | 'compliance';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<SettingsTab>('organization');
     const { isAdmin } = usePermissions();
+    const { user } = useAuthStore();
+    const isSuperAdmin = user?.role === 'SUPERADMIN';
 
     // Tabs base
-    const baseTabs: { id: SettingsTab; label: string; icon: any; adminOnly?: boolean }[] = [
+    const baseTabs: { id: SettingsTab; label: string; icon: any; adminOnly?: boolean; superAdminOnly?: boolean }[] = [
         { id: 'organization', label: 'Organização', icon: Building },
         { id: 'subscription', label: 'Assinatura', icon: CreditCard },
+        { id: 'activations', label: 'Activações', icon: Key, superAdminOnly: true },
         { id: 'categories', label: 'Categorias', icon: Layers },
         { id: 'users', label: 'Utilizadores', icon: Users, adminOnly: true },
         { id: 'user', label: 'Meu Perfil', icon: User },
         { id: 'printer', label: 'Impressora', icon: Printer },
-        { id: 'database', label: 'Base de Dados', icon: HardDrive },
+        { id: 'database', label: 'Base de Dados', icon: HardDrive, superAdminOnly: true },
         { id: 'system', label: 'Sistema', icon: Database },
         { id: 'compliance', label: 'Fiscal / SAF-T', icon: FileCode },
     ];
 
     // Filtrar tabs baseado em permissões
-    const tabs = baseTabs.filter(tab => !tab.adminOnly || isAdmin);
+    const tabs = baseTabs.filter(tab => {
+        if (tab.superAdminOnly && !isSuperAdmin) return false;
+        if (tab.adminOnly && !isAdmin) return false;
+        return true;
+    });
 
     return (
         <div className="space-y-6">
@@ -67,6 +76,7 @@ export default function SettingsPage() {
                 <div className="flex-1">
                     {activeTab === 'organization' && <OrganizationSettings />}
                     {activeTab === 'subscription' && <SubscriptionSettings />}
+                    {activeTab === 'activations' && isSuperAdmin && <ActivationManager />}
                     {activeTab === 'categories' && <CategorySettings />}
                     {activeTab === 'users' && isAdmin && <UsersManagement />}
                     {activeTab === 'user' && <UserSettings />}
