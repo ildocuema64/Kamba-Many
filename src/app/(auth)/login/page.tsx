@@ -13,6 +13,15 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [showDemoCreds, setShowDemoCreds] = useState(false);
+
+    useEffect(() => {
+        // Check if demo creds should be shown
+        const shouldHide = localStorage.getItem('kamba_hide_demo_creds');
+        if (!shouldHide) {
+            setShowDemoCreds(true);
+        }
+    }, []);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -26,6 +35,8 @@ export default function LoginPage() {
 
         try {
             await login(email, password);
+            // Hide demo creds on successful login
+            localStorage.setItem('kamba_hide_demo_creds', 'true');
             router.push('/dashboard');
         } catch (err) {
             setError((err as Error).message || 'Erro ao fazer login');
@@ -104,11 +115,23 @@ export default function LoginPage() {
                     </form>
 
                     {/* Demo Credentials */}
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="text-sm text-blue-800 font-medium mb-2">💡 Credenciais de Teste:</p>
-                        <p className="text-xs text-blue-700 font-mono">Email: ildocuema@gmail.com</p>
-                        <p className="text-xs text-blue-700 font-mono">Password: Ildo7..Marques</p>
-                    </div>
+                    {showDemoCreds && (
+                        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 relative group">
+                            <button
+                                onClick={() => {
+                                    setShowDemoCreds(false);
+                                    localStorage.setItem('kamba_hide_demo_creds', 'true');
+                                }}
+                                className="absolute top-2 right-2 text-blue-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Ocultar para sempre"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                            <p className="text-sm text-blue-800 font-medium mb-2">💡 Credenciais de Teste:</p>
+                            <p className="text-xs text-blue-700 font-mono">Email: ildocuema@gmail.com</p>
+                            <p className="text-xs text-blue-700 font-mono">Password: Ildo7..Marques</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer */}
